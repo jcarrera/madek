@@ -28,11 +28,32 @@ describe GraphQueries do
   end
 
   describe "Computing all the descendants of " do
+
     describe "top_set1" do
+
       it "should have 4 children" do
         GraphQueries.descendants(@top_set1).size.should == 4
       end
+
+      describe "scoped by accessible resources of a viewer" do
+        context "the view can view top_set1 and resource 121" do
+
+          before :each do
+            FactoryGirl.create :userpermission, user: @viewer, media_resource: @top_set1, view: true
+            FactoryGirl.create :userpermission, user: @viewer, media_resource: @child_121, view: true
+          end
+
+          it "should excatly contain the one descendant" do
+            descendants = GraphQueries.descendants(@top_set1).accessible_by_user(@viewer)
+            descendants.size.should == 1
+            descendants.should include(@child_121)
+          end
+
+        end
+      end
     end
+
+
   end
 
 end
