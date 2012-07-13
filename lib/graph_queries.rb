@@ -1,3 +1,5 @@
+require 'set'
+
 module GraphQueries
 
   def self.reachable_arcs_query media_set
@@ -17,7 +19,17 @@ module GraphQueries
   end
 
   def self.reachable_arcs media_set
-    MediaResourceArc.where(" id in ( #{reachable_arcs_query(media_set)} )")
+    if SQLHelper.adapter_is_postgresql? 
+      MediaResourceArc.where(" id in ( #{reachable_arcs_query(media_set)} )")
+    else 
+      arc_ids = Set.new(MediaResourceArc.where("parent_id = ?",media_set.id).map(&:id))
+      begin
+        arcs = MediaResourceArc.where("id in ( ? )",arc_ids)
+        prev_arc_ids = arc_ids
+        arc_ids = arc_ids | MediaResourceArc.where("parent_id in ( ? ) ", arcs.map(&:child_id))
+      end while prev_arc_ids != arc_ids
+      MediaResourceArc.where("id in ( ? )", arc_ids)
+    end
   end
 
   def self.descendants media_set
