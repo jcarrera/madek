@@ -27,7 +27,15 @@ describe GraphQueries do
 
   end
 
-  describe "Computing all the descendants of " do
+  describe "Computing all reachable arcs of a Set" do
+    describe "top_set1" do
+      it "should have 4 reachable arcs" do
+        GraphQueries.reachable_arcs(@top_set1).size.should == 4
+      end
+    end
+  end
+
+  describe "Computing all the descendants of" do
 
     describe "top_set1" do
 
