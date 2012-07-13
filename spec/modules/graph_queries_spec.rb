@@ -16,20 +16,15 @@ describe GraphQueries do
     @viewer = FactoryGirl.create :user
 
     @top_set1 = FactoryGirl.create :media_set, user: @owner
-    @child_11 = FactoryGirl.create :media_set, user: @owner
-    @top_set1.children << @child_11
+    @top_set1.children << (@child_11 = FactoryGirl.create :media_set, user: @owner)
+    @top_set1.children << (@child_12 = FactoryGirl.create :media_set, user: @owner)
 
-    @child_111 = FactoryGirl.create :media_set, user: @owner
-    @top_set1.children << @child_111
-
-    @child_12 = FactoryGirl.create :media_set, user: @owner
-    @top_set1.children << @child_12
-    @child_121 = FactoryGirl.create :media_resource, user: @owner
-    @child_12.children << @child_121
+    @child_11.children << (@child_111 = FactoryGirl.create :media_set, user: @owner)
+    @child_12.children << (@child_121 = FactoryGirl.create :media_resource, user: @owner)
 
     @top_set2 = FactoryGirl.create :media_set, user: @owner
-    @child_21 = FactoryGirl.create :media_set, user: @owner
-    @top_set2.children << @child_21
+    @top_set2.children << (@child_21 = FactoryGirl.create :media_set, user: @owner)
+
   end
 
   describe "Computing all the descendants of " do
