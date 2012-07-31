@@ -140,8 +140,8 @@ class MediaSetsGraphController
         .attr("y2", ((d)-> return d.target.y;))
         all_nodes.attr("transform", (d)-> return "translate(" + d.x + "," + d.y + ")";)
       @layout.start()
-      @layout.tick() for i in [0..ticks]
-      @layout.stop()
+      #@layout.tick() for i in [0..ticks]
+      #      @layout.stop()
       @el.find(".graph>.info").remove()
 
   redrawGraph: =>

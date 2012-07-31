@@ -33,7 +33,7 @@ gem 'rails_autolink', '~> 1.0'
 gem 'jquery-tmpl-rails', '~> 1.1'
 gem 'haml_assets'
 
-gem "d3_rails", "~> 2.9"
+# gem "d3_rails", "~> 2.9"
 
 # Gems used only for assets and not required in production environments by default.
 group :assets do
