@@ -1,28 +1,29 @@
 d3.layout.mds= ->
 
+  n = m = null
   nodes = []
   links = []
-
-  n = m = null
-
   link_distance = 100
-
   index_id_map = {}
   id_index_map = {}
-
   A = []
 
   event = d3.dispatch("start", "tick", "end")
 
 
-  initialize = ->
+  create_empty_nxn = (n)->
     A=[]
+    for i = [0 .. n-1]
+      A[i] = []
+    A
+
+  initialize = ->
     n = nodes.length
     m = links.length
+    A = create_empty_nxn n
     for i in [0..n-1]
       id_index_map[nodes[i].id] = i 
       index_id_map[i]=nodes[i].id
-      A[i]=[]
 
     for i in [0..n-1]
       A[i][i] = 0
@@ -34,6 +35,22 @@ d3.layout.mds= ->
       A[id_index_map[link.target.id]][id_index_map[link.source.id]] = link_distance
 
 
+  clone_2_darray = (A) ->
+    B=[]
+    for i in [0 .. A.length -1]
+      B[i]=[]
+      for j in [0 .. B.length -1]
+        B[i][j] = A[i][j]
+    B
+
+  floyd_warshall_apsp = (D_) ->
+    D = clone_2_darray D_
+    for k in [0 .. n-1]
+      for i in [0 .. n-1]
+        for j in [0 .. n-1]
+          D[i][j] = Math.min D[i][j], D[i][k] + D[k][j]
+    D
+
 
   mds = 
     nodes: (x)-> if x? then nodes = x; mds else nodes
@@ -43,13 +60,11 @@ d3.layout.mds= ->
     start: () ->
       event.start()
       initialize()
+      D = floyd_warshall_apsp A
 
+      # test floyd_warshall_apsp
       debugger
-      # now use Dijkstra e.g. to compute D
-      # http://jsclass.jcoglan.com/set.html
-      # http://mcc.id.au/2004/10/dijkstra.js
-      #
-       
+        
       mds
 
   d3.rebind(mds,event,"on")
