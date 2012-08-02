@@ -135,16 +135,13 @@ class MediaSetsGraphController
       all_nodes.append("image").attr("xlink:href", ((d)-> if d.is_favorite then "/assets/icons/button_favorit_on.png" else "")).attr("x", "-15px").attr("y", "-18px").attr("width", "14px").attr("height", "14px").attr("class", "favorite")
       all_nodes.append("image").attr("xlink:href", ((d)-> if d.is_private then "/assets/icons/locked.png" else if d.is_shared then "/assets/icons/shared.png" else if d.is_public then "/assets/icons/public.png")).attr("x", "0px").attr("y", "-18px").attr("width", "14px").attr("height", "14px").attr("class", "permissions")
 
-      @layout.on "tick", ->
-        debugger
 #      @layout.on "tick", ->
 #        all_links.attr("x1", ((d)-> return d.source.x;))
 #        .attr("y1", ((d)-> return d.source.y;))
 #        .attr("x2", ((d)-> return d.target.x;))
 #        .attr("y2", ((d)-> return d.target.y;))
 #        all_nodes.attr("transform", (d)-> return "translate(" + d.x + "," + d.y + ")";)
-      @layout.on "start", ->
-      @layout.start()
+      @layout.iterate()
       #@layout.tick() for i in [0..ticks]
       #      @layout.stop()
       @el.find(".graph>.info").remove()
