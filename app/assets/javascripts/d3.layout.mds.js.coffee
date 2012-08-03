@@ -17,6 +17,16 @@ d3.layout.mds= ->
       for j in [0 .. i-1]
         f(i,j)
 
+  # convenience function for getting matix values by arbitrary index 
+  mvalue = (M,i,j)->
+    if i > j
+      M[i][j]
+    else if i < j
+      M[j][i]
+    else
+      throw new Error "this should never happen"
+
+
   create_empty_nx0 = (n)->
     A=[]
     for i in [0 .. n-1]
@@ -51,10 +61,10 @@ d3.layout.mds= ->
         D[i][j] = max_dist if not isFinite(D[i][j])
     D
 
-
   compute_weight_matrix = (D)->
-    W = clone_2d_array D
+    W = create_empty_nx0 n
     loop_m n,(i,j) -> W[i][j] = Math.pow((1/D[i][j]),2)
+    W
 
 
   set_initial_coordinates_if_not_present = ->
@@ -102,8 +112,6 @@ d3.layout.mds= ->
 
   layout = ->
 
-    console.log "layouting"
-
     # jiggling prevents problems with bad initial layout but should not show
     # (much) randomness in the resulting layout
     for node in nodes 
@@ -117,25 +125,24 @@ d3.layout.mds= ->
       nj = nodes[j]
       CD[i][j] = Math.sqrt( Math.pow(ni.x - nj.x,2) + Math.pow(ni.y - nj.y,2) )
     
-
     new_pos = {x:[],y:[]}
 
-    debugger
-    for i in [1..n-1]
+    for i in [0..n-1]
       sum_wi = 0
-      for j in [0..i-1]
-        sum_wi +=  W[i][j]
+      for j in [0..n-1] when i isnt j
+        sum_wi += mvalue W,i,j 
       for d in ['x','y']
         numerator = 0
-        for j in [0..i-1]
+        for j in [0..n-1] when i isnt j
           pi = nodes[i][d]
           pj = nodes[j][d]
-          numerator += W[i][j] * ( pj + D[i][j] (pi-pj)/(CD[i][j]) )
+          numerator += mvalue(W,i,j) * ( pj + mvalue(D,i,j) * (pi-pj)/( mvalue(CD,i,j)))
 
-        now_pos[d][i] =  numerator / sum_wi
+        new_pos[d][i] =  numerator / sum_wi
 
-    debugger
-
+    for node in nodes
+      node.x = new_pos.x[id_index_map[node.id]]
+      node.y = new_pos.y[id_index_map[node.id]]
 
 
   event = d3.dispatch("tick", "initalization_done", "iteration_start", "iteration_end")
