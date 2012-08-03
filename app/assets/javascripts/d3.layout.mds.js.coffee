@@ -9,7 +9,7 @@ d3.layout.mds= ->
   A = []
   D = []
 
-  event = d3.dispatch("initalization_done", "iteration_start", "iteration_end")
+  event = d3.dispatch("tick", "initalization_done", "iteration_start", "iteration_end")
 
 
   create_empty_nx0 = (n)->
@@ -57,17 +57,25 @@ d3.layout.mds= ->
 
     event.initalization_done()
 
+  layout = ->
+    for n in nodes
+      console.log n
+  
   mds = 
     nodes: (x)-> if x? then nodes = x; needs_initialization=true; mds else nodes
     links: (x)-> if x? then links = x; needs_initialization=true; mds else links 
     link_distance: (x)-> if x? then link_distance = x; needs_initialization=true; mds else link_distance
 
-    iterate: () ->
-      event.iteration_start()
+    tick: () ->
       initialize() if needs_initialization
       debugger
       # compute layout here
-      event.iteration_end()
+      layout()
+      event.tick()
+
+    start: ->
+    stop: ->
+
 
   d3.rebind(mds,event,"on")
 
