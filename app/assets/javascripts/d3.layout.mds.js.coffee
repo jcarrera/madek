@@ -30,7 +30,7 @@ d3.layout.mds= ->
     for k in [0 .. n-1]
       for i in [1 .. n-1]
         for j in [0 .. i-1]
-          if j < k and k < i  
+          if j < k < i  
             D[i][j] = Math.min D[i][j], D[i][k] + D[k][j] 
     D
 
@@ -47,6 +47,17 @@ d3.layout.mds= ->
         D[i][j] = max_dist if not isFinite(D[i][j])
     D
 
+  set_initial_coordinates_if_not_present = ->
+
+    d = Math.ceil(Math.sqrt(n)) 
+
+    for k in [0 .. n-1]
+      i = k % d
+      j = Math.floor(k / d)
+      n = nodes[k]
+      n.x = i unless n.x?
+      n.y = j unless n.y?
+ 
 
   initialize = ->
     # once done remove A completely, it is essentially for prototyping/debugging
@@ -72,12 +83,13 @@ d3.layout.mds= ->
 
     D = replace_infinite_values D
 
+    set_initial_coordinates_if_not_present()
+
     event.initalization_done()
 
   layout = ->
-    for n in nodes
-      console.log n
-  
+
+ 
   mds = 
     nodes: (x)-> if x? then nodes = x; needs_initialization=true; mds else nodes
     links: (x)-> if x? then links = x; needs_initialization=true; mds else links 
