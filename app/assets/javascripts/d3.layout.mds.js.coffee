@@ -1,4 +1,5 @@
 d3.layout.mds= ->
+
   n = m = null
   needs_initialization = true
   nodes = []
@@ -33,6 +34,20 @@ d3.layout.mds= ->
             D[i][j] = Math.min D[i][j], D[i][k] + D[k][j] 
     D
 
+
+  replace_infinite_values = (A) ->
+    D = clone_2d_array A
+    max_dist = 0
+    for i in [1 .. n-1]
+      for j in [0 .. i-1]
+        max_dist = Math.max max_dist, D[i][j] if isFinite(D[i][j])
+    max_dist = max_dist + max_dist * 1/3
+    for i in [1 .. n-1]
+      for j in [0 .. i-1]
+        D[i][j] = max_dist if not isFinite(D[i][j])
+    D
+
+
   initialize = ->
     # once done remove A completely, it is essentially for prototyping/debugging
     n = nodes.length
@@ -54,6 +69,8 @@ d3.layout.mds= ->
     needs_initialization = false
 
     D = floyd_warshall A
+
+    D = replace_infinite_values D
 
     event.initalization_done()
 
