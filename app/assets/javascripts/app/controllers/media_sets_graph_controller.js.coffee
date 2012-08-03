@@ -1,7 +1,7 @@
 class MediaSetsGraphController
 
   use_mds = true
-  ticks = if use_mds then 3 else 100
+  ticks = if use_mds then 1 else 100
 
   el: "section.media_sets_graph"
   start_scale = 1.2
@@ -147,7 +147,7 @@ class MediaSetsGraphController
         .attr("y2", ((d)-> return d.target.y;))
         all_nodes.attr("transform", (d)-> return "translate(" + d.x + "," + d.y + ")";)
       @layout.start()
-      @layout.tick() for i in [0..ticks]
+      @layout.tick() for i in [1..ticks]
       @layout.stop()
       @el.find(".graph>.info").remove()
 

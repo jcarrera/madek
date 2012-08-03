@@ -7,11 +7,15 @@ d3.layout.mds= ->
   link_distance = 100
   index_id_map = {}
   id_index_map = {}
-  A = []
-  D = []
+  A = [] # adjacency matrix
+  D = [] # target distance, i.e. graph theoretic distance
+  W = [] # weight 
 
-  event = d3.dispatch("tick", "initalization_done", "iteration_start", "iteration_end")
-
+  # convenience function to loop over the matrix
+  loop_m = (n,f) -> 
+    for i in [1 .. n-1]
+      for j in [0 .. i-1]
+        f(i,j)
 
   create_empty_nx0 = (n)->
     A=[]
@@ -47,6 +51,12 @@ d3.layout.mds= ->
         D[i][j] = max_dist if not isFinite(D[i][j])
     D
 
+
+  compute_weight_matrix = (D)->
+    W = clone_2d_array D
+    loop_m n,(i,j) -> W[i][j] = Math.pow((1/D[i][j]),2)
+
+
   set_initial_coordinates_if_not_present = ->
 
     d = Math.ceil(Math.sqrt(n)) 
@@ -54,9 +64,9 @@ d3.layout.mds= ->
     for k in [0 .. n-1]
       i = k % d
       j = Math.floor(k / d)
-      n = nodes[k]
-      n.x = i unless n.x?
-      n.y = j unless n.y?
+      node = nodes[k]
+      node.x = i unless node.x?
+      node.y = j unless node.y?
  
 
   initialize = ->
@@ -83,12 +93,52 @@ d3.layout.mds= ->
 
     D = replace_infinite_values D
 
+    W = compute_weight_matrix D
+
     set_initial_coordinates_if_not_present()
 
     event.initalization_done()
 
+
   layout = ->
 
+    console.log "layouting"
+
+    # jiggling prevents problems with bad initial layout but should not show
+    # (much) randomness in the resulting layout
+    for node in nodes 
+      node.x += (Math.random()-0.5) / 10000000
+      node.y += (Math.random()-0.5) / 10000000
+
+    # current distance 
+    CD = create_empty_nx0 n
+    loop_m n,(i,j)->
+      ni = nodes[i]
+      nj = nodes[j]
+      CD[i][j] = Math.sqrt( Math.pow(ni.x - nj.x,2) + Math.pow(ni.y - nj.y,2) )
+    
+
+    new_pos = {x:[],y:[]}
+
+    debugger
+    for i in [1..n-1]
+      sum_wi = 0
+      for j in [0..i-1]
+        sum_wi +=  W[i][j]
+      for d in ['x','y']
+        numerator = 0
+        for j in [0..i-1]
+          pi = nodes[i][d]
+          pj = nodes[j][d]
+          numerator += W[i][j] * ( pj + D[i][j] (pi-pj)/(CD[i][j]) )
+
+        now_pos[d][i] =  numerator / sum_wi
+
+    debugger
+
+
+
+  event = d3.dispatch("tick", "initalization_done", "iteration_start", "iteration_end")
  
   mds = 
     nodes: (x)-> if x? then nodes = x; needs_initialization=true; mds else nodes
@@ -97,8 +147,6 @@ d3.layout.mds= ->
 
     tick: () ->
       initialize() if needs_initialization
-      debugger
-      # compute layout here
       layout()
       event.tick()
 
