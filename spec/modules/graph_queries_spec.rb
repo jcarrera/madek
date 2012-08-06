@@ -9,7 +9,7 @@ describe GraphQueries do
     # 1 -> 11 -> 111
     #   -> 12 -> 121 
     #
-    # 1 -> 21
+    # 2 -> 21
     #
 
     @owner = FactoryGirl.create :user
@@ -61,8 +61,33 @@ describe GraphQueries do
       end
     end
 
+    describe "top_set1 and top_set2" do
 
+      it "should have 5 children" do
+        GraphQueries.descendants([@top_set1,@top_set2]).size.should == 5
+      end
+
+      describe "scoped by accessible resources of a viewer" do
+
+        context "the viewer can view the top setsn and resource 121, and resource 21" do
+
+          before :each do
+            FactoryGirl.create :userpermission, user: @viewer, media_resource: @top_set1, view: true
+            FactoryGirl.create :userpermission, user: @viewer, media_resource: @child_121, view: true
+            FactoryGirl.create :userpermission, user: @viewer, media_resource: @top_set2, view: true
+            FactoryGirl.create :userpermission, user: @viewer, media_resource: @child_21, view: true
+          end
+
+          it "should excatly contain the one descendant" do
+            descendants = GraphQueries.descendants([@top_set1,@top_set2]).accessible_by_user(@viewer)
+            descendants.size.should == 2
+            descendants.should include(@child_121)
+            descendants.should include(@child_21)
+          end
+
+        end
+      end
+    end
   end
-
 end
 
