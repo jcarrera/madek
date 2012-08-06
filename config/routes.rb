@@ -6,7 +6,11 @@ MAdeK::Application.routes.draw do
 
   root :to => "application#root"
 
-###############################################
+#####################################################
+
+  match '/graph/data'  => "graph#data", via: ['get']
+
+#####################################################
 
   match '/help', :to => "application#help"
   match '/feedback', :to => "application#feedback"
