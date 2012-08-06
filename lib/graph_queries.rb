@@ -43,6 +43,9 @@ module GraphQueries
     MediaResource.where(" id in ( #{reachable_arcs(media_set_s).select("child_id").to_sql} ) ")
   end
 
+  def self.connecting_arcs media_resources
+    MediaResourceArc.connecting(media_resources)
+  end
 
 end
 

@@ -88,6 +88,20 @@ describe GraphQueries do
         end
       end
     end
+
+    describe "Connecting Arcs" do
+
+      it "should give excaclty arcs between the given resources" do
+        arcs = MediaResourceArc.connecting [@top_set1,@child_12,@child_121]
+        arcs.size.should == 2
+      end
+
+      it "shoud give the same result if we query the GraphQueries module" do
+        GraphQueries.connecting_arcs([@top_set1,@child_12,@child_121]).should ==
+          MediaResourceArc.connecting([@top_set1,@child_12,@child_121])
+      end
+
+    end
   end
 end
 
