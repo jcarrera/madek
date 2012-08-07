@@ -4,7 +4,7 @@ d3.layout.mds= ->
   needs_initialization = true
   nodes = []
   links = []
-  link_distance = 100
+  link_distance = 200
   index_id_map = {}
   id_index_map = {}
   A = [] # adjacency matrix
@@ -55,7 +55,7 @@ d3.layout.mds= ->
     for i in [1 .. n-1]
       for j in [0 .. i-1]
         max_dist = Math.max max_dist, D[i][j] if isFinite(D[i][j])
-    max_dist = max_dist + max_dist * 1/3
+    max_dist = 3 * max_dist # max_dist + max_dist * 1/3
     for i in [1 .. n-1]
       for j in [0 .. i-1]
         D[i][j] = max_dist if not isFinite(D[i][j])
