@@ -1,6 +1,7 @@
 <script>
   Visualization.router = new Visualization.Routers.Router();
-  Backbone.history.start();
+  debugger
+  Backbone.history.start({pushState: true, root: "/visualization/"})
 </script>
 
 <div id="visualization">

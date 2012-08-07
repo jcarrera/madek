@@ -3,6 +3,7 @@ window.Visualization.Routers.Router = Backbone.Router.extend(
     "/*" : "root" 
 
   root: ->
-    alert("RootRoute")
+    @navigate "my_sets_and_direct_descendants/", {trigger: true}
+
   
 )
