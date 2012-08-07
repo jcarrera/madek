@@ -2,7 +2,9 @@ require 'set'
 
 module GraphQueries
 
-  def self.reachable_arcs_query media_resource_ids
+  class << self
+
+  def reachable_arcs_query media_resource_ids
     "
       WITH RECURSIVE pair(p,c) as
       (
@@ -18,7 +20,7 @@ module GraphQueries
     "
   end
 
-  def self.reachable_arcs media_resource_s
+  def reachable_arcs media_resource_s
     ids = 
       if media_resource_s.is_a? Array
         media_resource_s.map(&:id)
@@ -39,12 +41,23 @@ module GraphQueries
     end
   end
 
-  def self.descendants media_set_s
+  def descendants media_set_s
     MediaResource.where(" id in ( #{reachable_arcs(media_set_s).select("child_id").to_sql} ) ")
   end
 
-  def self.connecting_arcs media_resources
+
+  def user_sets_and_direct_descendant_resources user
+    start_set = MediaSet.where(user_id: user.id)
+    child_ids = MediaSet.joins(:out_arcs).where(user_id: user.id).select("media_resource_arcs.child_id").to_sql
+    target_set = MediaResource.where("id in (#{child_ids})").where(user_id: user.id)
+    MediaResource.where(" id in ( #{start_set.select("id").to_sql} UNION #{target_set.select("id").to_sql})")
+  end
+
+
+  def connecting_arcs media_resources
     MediaResourceArc.connecting(media_resources)
+  end
+
   end
 
 end

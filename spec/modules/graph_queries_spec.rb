@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'Set'
 
 describe GraphQueries do
 
@@ -6,10 +7,14 @@ describe GraphQueries do
 
     #
     #
+    # @user: 
     # 1 -> 11 -> 111
     #   -> 12 -> 121 
     #
     # 2 -> 21
+    #
+    # @viewer: 
+    # 3 -> 31
     #
 
     @owner = FactoryGirl.create :user
@@ -22,8 +27,15 @@ describe GraphQueries do
     @child_11.children << (@child_111 = FactoryGirl.create :media_set, user: @owner)
     @child_12.children << (@child_121 = FactoryGirl.create :media_resource, user: @owner)
 
+    @owners_media_resource = FactoryGirl.create :media_resource, user: @owner
+
     @top_set2 = FactoryGirl.create :media_set, user: @owner
     @top_set2.children << (@child_21 = FactoryGirl.create :media_set, user: @owner)
+
+    @top_set3 = FactoryGirl.create :media_set, user: @viewer
+    @top_set3.children << (@child_31 = FactoryGirl.create :media_set, user: @viewer)
+
+    @viewers_media_resource = FactoryGirl.create :media_resource, user: @viewer
 
   end
 
@@ -89,19 +101,38 @@ describe GraphQueries do
       end
     end
 
-    describe "Connecting Arcs" do
+  end
 
-      it "should give excaclty arcs between the given resources" do
-        arcs = MediaResourceArc.connecting [@top_set1,@child_12,@child_121]
-        arcs.size.should == 2
-      end
+  describe "user_sets_and_direct_descendant_resources" do
 
-      it "shoud give the same result if we query the GraphQueries module" do
-        GraphQueries.connecting_arcs([@top_set1,@child_12,@child_121]).should ==
-          MediaResourceArc.connecting([@top_set1,@child_12,@child_121])
-      end
+    it "should exactly return  1, 11, 111, 12, 121, and 2, 21 for @owner" do
+      GraphQueries.user_sets_and_direct_descendant_resources(@owner).size.should ==  7
+
+      Set.new(GraphQueries.user_sets_and_direct_descendant_resources(@owner)).should ==
+        Set.new([@top_set1,@child_11,@child_111,@child_12,@child_121,@top_set2,@child_21])
+    end
+
+    it "should excatly return 3, 31 for viewer" do
+      Set.new(GraphQueries.user_sets_and_direct_descendant_resources(@viewer)).should ==
+        Set.new([@top_set3,@child_31])
 
     end
+
   end
+
+  describe "Connecting Arcs" do
+
+    it "should give excaclty arcs between the given resources" do
+      arcs = MediaResourceArc.connecting [@top_set1,@child_12,@child_121]
+      arcs.size.should == 2
+    end
+
+    it "shoud give the same result if we query the GraphQueries module" do
+      GraphQueries.connecting_arcs([@top_set1,@child_12,@child_121]).should ==
+        MediaResourceArc.connecting([@top_set1,@child_12,@child_121])
+    end
+
+  end
+
 end
 
