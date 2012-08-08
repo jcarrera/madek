@@ -2,7 +2,6 @@
   %td= meta_key_definition.meta_context.name
   %td= meta_key_definition.meta_key.label
   %td= meta_key_definition.is_required
-//  %td.with_actions
-//    = link_to _("Edit"), edit_admin_key_path(key), :class => "buttons", :remote => true, :"data-type" => "html"
-//    %br
-//    = link_to _("Delete"), admin_key_path(key), :class => "buttons", :method => :delete, :data => {:confirm => _("Sind Sie sicher?")} if key.is_deletable?
+  %td.with_actions
+    = link_to _("Edit"), edit_admin_meta_key_definition_path(meta_key_definition), :class => "buttons", :remote => true, :"data-type" => "html"
+
