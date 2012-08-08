@@ -8,7 +8,7 @@ MAdeK::Application.routes.draw do
 
 #####################################################
 
-  match 'visualization' => 'visualization#index', via: ['get']
+  match 'visualization/*params' => 'visualization#index', via: ['get']
   match '/graph/data'  => "graph#data", via: ['get']
 
 #####################################################

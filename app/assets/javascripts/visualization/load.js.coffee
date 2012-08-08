@@ -13,3 +13,8 @@ window.Visualization =
   Modules: {}
   Routers: {}
   Views: {}
+
+window.Visualization.init = ->
+  window.Visualization.router = new Visualization.Routers.Router();
+  Backbone.history.start({pushState: true, root: "/visualization/"})
+
