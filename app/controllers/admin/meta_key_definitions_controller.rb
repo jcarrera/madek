@@ -12,7 +12,13 @@ class Admin::MetaKeyDefinitionsController < Admin::AdminController
   end
 
   def update 
-    binding.pry
+    @meta_key_definition = MetaKeyDefinition.find(params[:id])
+    @meta_key_definition.update_attributes(params[:meta_key_definition])
+
+    respond_to do |format|
+      format.js { render partial: "show", locals: {meta_key_definition: @meta_key_definition} }
+    end
+
   end
 
 end
