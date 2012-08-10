@@ -9,7 +9,7 @@ module GraphQueries
       WITH RECURSIVE pair(p,c) as
       (
           SELECT parent_id as p, child_id as c FROM media_resource_arcs 
-            WHERE parent_id in (#{media_resource_ids})
+            WHERE parent_id in (#{media_resource_ids.join(", ")})
         UNION
           SELECT parent_id as p, child_id as c FROM pair, media_resource_arcs
             WHERE parent_id = pair.c

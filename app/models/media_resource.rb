@@ -33,7 +33,6 @@ class MediaResource < ActiveRecord::Base
   has_one :full_text, :dependent => :destroy
   after_save { reindex } # OPTIMIZE
 
-
   # Instance method to update a copy (referenced by path) of a media file with the meta_data tags provided
   # args: blank_all_tags = flag indicating whether we clean all the tags from the file, or update the tags in the file
   # returns: the path and filename of the updated copy or nil (if the copy failed)
@@ -65,6 +64,14 @@ class MediaResource < ActiveRecord::Base
     end
   end
     
+########################################################
+
+  # this computs the size of a set; it defined here so
+  # we can call it consistently for all resources
+  def size(user=nil)
+    0
+  end
+ 
 ########################################################
 
   def get_media_file(user = nil)
