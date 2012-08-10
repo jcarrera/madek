@@ -5,4 +5,8 @@
 </script>
 
 <div id="visualization">
+  <%= content_tag "div", id: "graph-data" , data: {
+    nodes: @resources.as_json(only: [:id,:type] ), 
+    arcs: @arcs.as_json(only: [:child_id,:parent_id])} do  %>
+  <% end %>
 </div>
