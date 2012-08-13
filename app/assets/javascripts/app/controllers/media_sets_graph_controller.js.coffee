@@ -1,6 +1,6 @@
 class MediaSetsGraphController
 
-  use_mds = true
+  use_mds = false
   ticks = if use_mds then 100 else 100
 
   el: "section.media_sets_graph"
@@ -126,6 +126,7 @@ class MediaSetsGraphController
         nodes[node.id] = node
       for link in json.links
         links.push {source: nodes[link.source_id], target: nodes[link.target_id], type: "suit"}
+      debugger
 
       if use_mds 
         @layout = d3.layout.mds()
@@ -141,7 +142,7 @@ class MediaSetsGraphController
       all_nodes.append("image").attr("xlink:href", ((d)-> if d.is_private then "/assets/icons/locked.png" else if d.is_shared then "/assets/icons/shared.png" else if d.is_public then "/assets/icons/public.png")).attr("x", "0px").attr("y", "-18px").attr("width", "14px").attr("height", "14px").attr("class", "permissions")
 
       @layout.on "tick", ->
-        all_links.attr("x1", ((d)-> debugger; return d.source.x;))
+        all_links.attr("x1", ((d)-> return d.source.x;))
         .attr("y1", ((d)-> return d.source.y;))
         .attr("x2", ((d)-> return d.target.x;))
         .attr("y2", ((d)-> return d.target.y;))

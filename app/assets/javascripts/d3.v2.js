@@ -5256,7 +5256,6 @@ d3.layout.force = function() {
   };
 
   force.nodes = function(x) {
-    debugger
     if (!arguments.length) return nodes;
     nodes = x;
     return force;
@@ -5337,8 +5336,6 @@ d3.layout.force = function() {
         h = size[1],
         neighbors,
         o;
-
-    debugger
 
     for (i = 0; i < n; ++i) {
       (o = nodes[i]).index = i;
