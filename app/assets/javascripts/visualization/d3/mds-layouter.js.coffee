@@ -117,9 +117,9 @@ d3.layout.mds= ->
       M[i][j] = Math.sqrt( Math.pow(ni.x - nj.x,2) + Math.pow(ni.y - nj.y,2) )
     M 
 
-  stress = ->
+  stress = (_CD) ->
     sum = 0 
-    CD = current_distance_matrix()
+    CD = _CD ? current_distance_matrix()
     loop_m n, (i,j) ->
       sum += Math.pow( D[i][j] - CD[i][j], 2) /  Math.pow(D[i][j],2)
     sum
@@ -165,8 +165,10 @@ d3.layout.mds= ->
 
     tick: () ->
       initialize() if needs_initialization
+      initial_stress = stress()
       layout()
-      event.tick()
+      new_stress = stress()
+      event.tick( (initial_stress-new_stress)/new_stress )
 
     stress: stress
 

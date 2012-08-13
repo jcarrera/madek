@@ -45,9 +45,13 @@ window.Visualization.init = ->
     console.log "mds-layouter initalization_done"
     console.log "current stress #{layouter.stress()}"
 
-  layouter.on "tick", ->
-    console.log "mds-layouter tick"
-    console.log "current stress #{layouter.stress()}"
+  iteration = 0
+  layouter.on "tick", (stress_improvement) ->
+    console.log "mds-layouter tick #{++iteration}"
+    console.log "stress_improvement #{stress_improvement}"
+
+    if stress_improvement > 0.03
+      setTimeout(layouter.tick,0)
 
   layouter.tick()
 
