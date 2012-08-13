@@ -43,9 +43,11 @@ window.Visualization.init = ->
 
   layouter.on "initalization_done", ->
     console.log "mds-layouter initalization_done"
+    console.log "current stress #{layouter.stress()}"
 
   layouter.on "tick", ->
     console.log "mds-layouter tick"
+    console.log "current stress #{layouter.stress()}"
 
   layouter.tick()
 

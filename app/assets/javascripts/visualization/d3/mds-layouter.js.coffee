@@ -109,6 +109,21 @@ d3.layout.mds= ->
 
     event.initalization_done()
 
+  current_distance_matrix = ->
+    M = create_empty_nx0 n
+    loop_m n, (i,j) ->
+      ni = nodes[i]
+      nj = nodes[j]
+      M[i][j] = Math.sqrt( Math.pow(ni.x - nj.x,2) + Math.pow(ni.y - nj.y,2) )
+    M 
+
+  stress = ->
+    sum = 0 
+    CD = current_distance_matrix()
+    loop_m n, (i,j) ->
+      sum += Math.pow( D[i][j] - CD[i][j], 2) /  Math.pow(D[i][j],2)
+    sum
+
 
   layout = ->
 
@@ -119,12 +134,8 @@ d3.layout.mds= ->
       node.y += (Math.random()-0.5) / 10000000
 
     # current distance 
-    CD = create_empty_nx0 n
-    loop_m n,(i,j)->
-      ni = nodes[i]
-      nj = nodes[j]
-      CD[i][j] = Math.sqrt( Math.pow(ni.x - nj.x,2) + Math.pow(ni.y - nj.y,2) )
-    
+    CD = current_distance_matrix()     
+
     new_pos = {x:[],y:[]}
 
     for i in [0..n-1]
@@ -156,6 +167,8 @@ d3.layout.mds= ->
       initialize() if needs_initialization
       layout()
       event.tick()
+
+    stress: stress
 
     start: ->
     stop: ->
