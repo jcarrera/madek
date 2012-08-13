@@ -1,4 +1,5 @@
 #= require_self
+#= require_tree ./d3
 #= require_tree ./functions
 #= require_tree ./modules
 #= require_tree ./templates
@@ -8,13 +9,14 @@
 
 window.Visualization =
   Collections: {}
+  Data: {}
   Functions: {}
+  Graph: {}
   Models: {}
   Modules: {}
+  Objects: {}
   Routers: {}
   Views: {}
-  Graph: {}
-  Data: {}
 
 window.Visualization.init = ->
 
@@ -27,15 +29,23 @@ window.Visualization.init = ->
     n.parents = []
     nodes[n.id] = n
   $("#graph-data").data("arcs").forEach (arc)->
+    arc.source = nodes[arc.parent_id]
+    arc.target = nodes[arc.child_id]
     arcs.push arc
     nodes[arc.parent_id].children.push arc.child_id
     nodes[arc.child_id].parents.push arc.parent_id
 
-  Visualization.Data.svg = svg = d3.select("#visualization").append("svg").attr("width", 600).attr("height", 600);
+  Visualization.Data.svg = svg = d3.select("#visualization").append("svg").attr("width", 800).attr("height", 800);
 
+  layouter = Visualization.Objects.layouter = d3.layout.mds()
 
-    
+  layouter.nodes(d3.values(nodes)).links(arcs)
 
+  layouter.on "initalization_done", ->
+    console.log "mds-layouter initalization_done"
 
+  layouter.on "tick", ->
+    console.log "mds-layouter tick"
 
+  layouter.tick()
 

@@ -133,6 +133,7 @@ class MediaSetsGraphController
       else
         @layout = d3.layout.force().gravity(0.05).friction(0.4).charge(-300).linkDistance(120).size([@width, @height])
       @layout.nodes(d3.values(nodes)).links(links)
+      debugger
       all_links = @graph.selectAll(".link").data(@layout.links()).enter().append("line").attr("class", "link").attr("marker-end", "url(#suit)")
       all_nodes = @graph.selectAll(".node").data(@layout.nodes()).enter().append("g").attr("class", "node").attr("data-id", ((d)-> return d.id))
       all_nodes.append("rect").attr("width", ((d)-> if MetaDatum.flatten(d.meta_data).title? then MetaDatum.flatten(d.meta_data).title.length*7+24 else 30)).attr("height","26px").attr("y", "-13px").attr("x", "-15px").attr("rx", "5px").attr("ry", "5px")
