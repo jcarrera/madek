@@ -22,6 +22,7 @@ window.Visualization.init = ->
 
   # graph datastructure
   graph = Visualization.Graph
+  data = Visualization.Data
   graph.nodes = nodes =  {}
   graph.arcs= arcs = []
   $("#graph-data").data("nodes").forEach (n)->
@@ -68,10 +69,16 @@ window.Visualization.init = ->
     else
       nodes_vis.attr("cx",(n)->n.x).attr("cy",(n)->n.y)
       bbox = Visualization.Data.bbox = Visualization.Functions.bbox  $("#drawing .node")
+      bbox_center = Visualization.Data.bbox_center= Visualization.Functions.center_of_box bbox
       graph.select("rect#bbox").remove()
       graph.append("svg:rect").attr("id","bbox").attr("x",bbox[0]).attr("y",bbox[1]).attr("width",bbox[2]-bbox[0]).attr("height",bbox[3]-bbox[1])
-      bbox_center = Visualization.Data.bbox_center = Visualization.Functions.center_of_box bbox
-      graph.attr("transform","translate (#{ svg_width()/2 - bbox_center[0] },#{ svg_height()/2 - bbox_center[1] })  ")
+      graph.append("svg:circle").attr("id","center").attr("r",2).attr("cx",bbox_center[0]).attr("cy",bbox_center[1])
+      scale = Visualization.Data.scale  =  Math.min(svg_width() / (bbox[2] - bbox[0]), svg_height() / (bbox[3] - bbox[1]))
+      scaled_bbox_center = bbox_center.map( (x)-> x * scale)
+      tx = data.tx =  svg_width()/2 - scaled_bbox_center[0] 
+      ty = data.ty = svg_height()/2 - scaled_bbox_center[1] 
+      graph.attr("transform","translate(#{tx},#{ty}) scale(#{scale},#{scale}) ")  
+      debugger
 
   layouter.iterate()
 
