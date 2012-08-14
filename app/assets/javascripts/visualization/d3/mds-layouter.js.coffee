@@ -9,6 +9,7 @@ d3.layout.mds = ->
   id_index_map = {}
   A = [] # adjacency matrix
   D = [] # target distance, i.e. graph theoretic distance
+  C = null # current distance matrix; distance after the last iteration
   W = [] # weight 
 
   # convenience function to loop over the matrix
@@ -107,6 +108,8 @@ d3.layout.mds = ->
 
     set_initial_coordinates_if_not_present()
 
+    C = current_distance_matrix()
+
     event.initalization_done()
 
   current_distance_matrix = ->
@@ -117,13 +120,11 @@ d3.layout.mds = ->
       M[i][j] = Math.sqrt( Math.pow(ni.x - nj.x,2) + Math.pow(ni.y - nj.y,2) )
     M 
 
-  stress = (_CD) ->
+  stress = ->
     sum = 0 
-    CD = _CD ? current_distance_matrix()
     loop_m n, (i,j) ->
-      sum += Math.pow( D[i][j] - CD[i][j], 2) /  Math.pow(D[i][j],2)
+      sum += Math.pow( D[i][j] - C[i][j], 2) /  Math.pow(D[i][j],2)
     sum
-
 
   layout = ->
 
@@ -132,9 +133,6 @@ d3.layout.mds = ->
     for node in nodes 
       node.x += (Math.random()-0.5) / 10000000
       node.y += (Math.random()-0.5) / 10000000
-
-    # current distance 
-    CD = current_distance_matrix()     
 
     new_pos = {x:[],y:[]}
 
@@ -147,7 +145,7 @@ d3.layout.mds = ->
         for j in [0..n-1] when i isnt j
           pi = nodes[i][d]
           pj = nodes[j][d]
-          numerator += mvalue(W,i,j) * ( pj + mvalue(D,i,j) * (pi-pj)/( mvalue(CD,i,j)))
+          numerator += mvalue(W,i,j) * ( pj + mvalue(D,i,j) * (pi-pj)/( mvalue(C,i,j)))
 
         new_pos[d][i] =  numerator / sum_wi
 
@@ -166,10 +164,11 @@ d3.layout.mds = ->
     iterate: () ->
       event.iteration_start()
       initialize() if needs_initialization
-      initial_stress = stress()
+      #initial_stress = stress()
       layout()
-      new_stress = stress()
-      event.iteration_end( (initial_stress-new_stress)/new_stress )
+      C = current_distance_matrix()
+      #new_stress = stress()
+      event.iteration_end()
 
     stress: stress
 

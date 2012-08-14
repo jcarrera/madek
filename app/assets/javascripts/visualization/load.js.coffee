@@ -79,17 +79,19 @@ window.Visualization.init = ->
     console.log "current stress #{layouter.stress()}"
 
   iteration_count = 0
+  prev_stress = Number.MAX_VALUE
+  current_stress = NaN
+  stress_improvement = 1
 
-  layouter.on "iteration_end", (stress_improvement) ->
+  layouter.on "iteration_end", () ->
     console.log "mds-layouter iteration_end #{++iteration_count}"
-    console.log "current stress #{layouter.stress()}"
-    console.log "stress_improvement #{stress_improvement}"
-
-    if stress_improvement > 0.0001
+    if iteration_count % 20 == 0
       redraw()
-      setTimeout(layouter.iterate,0)
-    else
-      redraw()
+      current_stress = layouter.stress()
+      stress_improvement = (prev_stress - current_stress)/prev_stress
+      console.log "current stress #{current_stress}"
+      console.log "stress_improvement #{stress_improvement}"
+    if stress_improvement > 0.001
+      setTimeout(layouter.iterate,1)
 
   layouter.iterate()
-
