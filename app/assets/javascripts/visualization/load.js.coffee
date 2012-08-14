@@ -35,23 +35,32 @@ window.Visualization.init = ->
     nodes[arc.parent_id].children.push arc.child_id
     nodes[arc.child_id].parents.push arc.parent_id
 
-  Visualization.Data.svg = svg = d3.select("#visualization").append("svg").attr("width", 800).attr("height", 800);
+  Visualization.Data.svg = svg = d3.select("#visualization").append("svg").attr("width", 800).attr("height", 800).attr('id','drawing')
 
   layouter = Visualization.Objects.layouter = d3.layout.mds()
 
   layouter.nodes(d3.values(nodes)).links(arcs)
 
+  nodes_vis= svg.selectAll("circle.node")
+    .data(layouter.nodes()).enter().append("circle").attr("class",(n)->"node #{n.type}").attr("r",10).attr("id",(n)->"resource-#{n.id}")
+
   layouter.on "initalization_done", ->
     console.log "mds-layouter initalization_done"
     console.log "current stress #{layouter.stress()}"
 
+
   iteration = 0
+
   layouter.on "tick", (stress_improvement) ->
     console.log "mds-layouter tick #{++iteration}"
+    console.log "current stress #{layouter.stress()}"
     console.log "stress_improvement #{stress_improvement}"
 
     if stress_improvement > 0.03
       setTimeout(layouter.tick,0)
+    else
+      nodes_vis.attr("cx",(n)->n.x).attr("cy",(n)->n.y)
+      bbox = Visualization.Data.bbox = Visualization.Functions.bbox  $("#drawing .node")
 
   layouter.tick()
 
