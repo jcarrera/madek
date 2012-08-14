@@ -1,4 +1,4 @@
-d3.layout.mds= ->
+d3.layout.mds = ->
 
   n = m = null
   needs_initialization = true
@@ -156,26 +156,24 @@ d3.layout.mds= ->
       node.y = new_pos.y[id_index_map[node.id]]
 
 
-  event = d3.dispatch("tick", "initalization_done", "iteration_start", "iteration_end")
+  event = d3.dispatch("iteration_start","iteration_end", "initalization_done")
  
   mds = 
     nodes: (x)-> if x? then nodes = x; needs_initialization=true; mds else nodes
     links: (x)-> if x? then links = x; needs_initialization=true; mds else links 
     link_distance: (x)-> if x? then link_distance = x; needs_initialization=true; mds else link_distance
 
-    tick: () ->
+    iterate: () ->
+      event.iteration_start()
       initialize() if needs_initialization
       initial_stress = stress()
       layout()
       new_stress = stress()
-      event.tick( (initial_stress-new_stress)/new_stress )
+      event.iteration_end( (initial_stress-new_stress)/new_stress )
 
     stress: stress
 
     start: ->
     stop: ->
 
-
   d3.rebind(mds,event,"on")
-
-

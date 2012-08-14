@@ -1,6 +1,6 @@
 class MediaSetsGraphController
 
-  use_mds = false
+  use_mds = true
   ticks = if use_mds then 100 else 100
 
   el: "section.media_sets_graph"
