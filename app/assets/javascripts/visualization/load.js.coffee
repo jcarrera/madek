@@ -11,19 +11,20 @@ window.Visualization =
   Collections: {}
   Data: {}
   Functions: {}
-  Graph: {}
   Models: {}
   Modules: {}
   Objects: {}
   Routers: {}
   Views: {}
+  State: {}
 
 window.Visualization.init = ->
 
   # graph datastructure
-  graph = Visualization.Graph
-  data = Visualization.Data
+  graph = Visualization.Data.graph = {}
+  state = Visualization.State
   graph.nodes = nodes =  {}
+ 
   graph.arcs= arcs = []
   $("#graph-data").data("nodes").forEach (n)->
     n.children = []
@@ -36,7 +37,7 @@ window.Visualization.init = ->
     nodes[arc.parent_id].children.push arc.child_id
     nodes[arc.child_id].parents.push arc.parent_id
 
-  Visualization.Data.svg = svg = d3.select("#visualization").append("svg:svg").attr("width", 800).attr("height", 800).attr('id','drawing')
+  svg = data.svg = d3.select("#visualization").append("svg:svg").attr("width", 800).attr("height", 800).attr('id','drawing')
 
   svg_height = ->
     $("#visualization svg").attr("height")
@@ -56,7 +57,6 @@ window.Visualization.init = ->
     console.log "mds-layouter initalization_done"
     console.log "current stress #{layouter.stress()}"
 
-
   iteration_count = 0
 
   layouter.on "iteration_end", (stress_improvement) ->
@@ -68,17 +68,16 @@ window.Visualization.init = ->
       setTimeout(layouter.iterate,0)
     else
       nodes_vis.attr("cx",(n)->n.x).attr("cy",(n)->n.y)
-      bbox = Visualization.Data.bbox = Visualization.Functions.bbox  $("#drawing .node")
-      bbox_center = Visualization.Data.bbox_center= Visualization.Functions.center_of_box bbox
+      bbox = state.bbox = Visualization.Functions.bbox  $("#drawing .node")
+      bbox_center = state.bbox_center= Visualization.Functions.center_of_box bbox
       graph.select("rect#bbox").remove()
       graph.append("svg:rect").attr("id","bbox").attr("x",bbox[0]).attr("y",bbox[1]).attr("width",bbox[2]-bbox[0]).attr("height",bbox[3]-bbox[1])
       graph.append("svg:circle").attr("id","center").attr("r",2).attr("cx",bbox_center[0]).attr("cy",bbox_center[1])
-      scale = Visualization.Data.scale  =  Math.min(svg_width() / (bbox[2] - bbox[0]), svg_height() / (bbox[3] - bbox[1]))
+      scale = state.scale  =  Math.min(svg_width() / (bbox[2] - bbox[0]), svg_height() / (bbox[3] - bbox[1]))
       scaled_bbox_center = bbox_center.map( (x)-> x * scale)
-      tx = data.tx =  svg_width()/2 - scaled_bbox_center[0] 
-      ty = data.ty = svg_height()/2 - scaled_bbox_center[1] 
+      tx = state.tx =  svg_width()/2 - scaled_bbox_center[0] 
+      ty = state.ty = svg_height()/2 - scaled_bbox_center[1] 
       graph.attr("transform","translate(#{tx},#{ty}) scale(#{scale},#{scale}) ")  
-      debugger
 
   layouter.iterate()
 
