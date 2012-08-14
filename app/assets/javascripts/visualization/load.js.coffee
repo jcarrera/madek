@@ -66,6 +66,7 @@ window.Visualization.init = ->
       bbox_center = state.bbox_center= Visualization.Functions.center_of_box bbox
       svg_graph.select("rect#bbox").remove()
       svg_graph.append("svg:rect").attr("id","bbox").attr("x",bbox[0]).attr("y",bbox[1]).attr("width",bbox[2]-bbox[0]).attr("height",bbox[3]-bbox[1])
+      svg_graph.select("circle#center").remove()
       svg_graph.append("svg:circle").attr("id","center").attr("r",2).attr("cx",bbox_center[0]).attr("cy",bbox_center[1])
       scale = state.scale  =  Math.min(svg_width() / (bbox[2] - bbox[0]), svg_height() / (bbox[3] - bbox[1]))
       scaled_bbox_center = bbox_center.map( (x)-> x * scale)
@@ -84,14 +85,15 @@ window.Visualization.init = ->
   stress_improvement = 1
 
   layouter.on "iteration_end", () ->
-    console.log "mds-layouter iteration_end #{++iteration_count}"
+    console.log "mds-layouter iteration_end #{iteration_count++}"
     if iteration_count % 20 == 0
       redraw()
       current_stress = layouter.stress()
       stress_improvement = (prev_stress - current_stress)/prev_stress
+      prev_stress = current_stress
       console.log "current stress #{current_stress}"
       console.log "stress_improvement #{stress_improvement}"
-    if stress_improvement > 0.001
+    if stress_improvement > 0.00001
       setTimeout(layouter.iterate,1)
 
   layouter.iterate()
