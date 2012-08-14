@@ -7,4 +7,6 @@ Visualization.Functions.bbox = (svg_elements) ->
     .value()
 
 
+Visualization.Functions.center_of_box = (box) ->
+  [box[0]+(box[2]-box[0])/2, box[1]+(box[3]-box[0])/2]
 

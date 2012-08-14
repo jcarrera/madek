@@ -37,6 +37,11 @@ window.Visualization.init = ->
 
   Visualization.Data.svg = svg = d3.select("#visualization").append("svg:svg").attr("width", 800).attr("height", 800).attr('id','drawing')
 
+  svg_height = ->
+    $("#visualization svg").attr("height")
+  svg_width = ->
+    $("#visualization svg").attr("width")
+
   layouter = Visualization.Objects.layouter = d3.layout.mds()
 
   layouter.nodes(d3.values(nodes)).links(arcs)
@@ -65,6 +70,8 @@ window.Visualization.init = ->
       bbox = Visualization.Data.bbox = Visualization.Functions.bbox  $("#drawing .node")
       graph.select("rect#bbox").remove()
       graph.append("svg:rect").attr("id","bbox").attr("x",bbox[0]).attr("y",bbox[1]).attr("width",bbox[2]-bbox[0]).attr("height",bbox[3]-bbox[1])
+      bbox_center = Visualization.Data.bbox_center = Visualization.Functions.center_of_box bbox
+      graph.attr("transform","translate (#{ svg_width()/2 - bbox_center[0] },#{ svg_height()/2 - bbox_center[1] })  ")
 
   layouter.iterate()
 
