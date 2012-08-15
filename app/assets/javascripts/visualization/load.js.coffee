@@ -100,7 +100,7 @@ window.Visualization.init = ->
       state.prev_stress = state.current_stress
       console.log "current stress #{state.current_stress}"
       console.log "state.stress_improvement #{state.stress_improvement}"
-    if (state.stress_improvement > state.stress_threshold) and false # TODO REMOVE ME
+    if (state.stress_improvement > state.stress_threshold) 
       setTimeout(layouter.iterate,1)
 
   layouter.iterate()

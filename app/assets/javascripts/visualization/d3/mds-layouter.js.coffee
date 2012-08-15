@@ -4,7 +4,7 @@ d3.layout.mds = ->
   needs_initialization = true
   nodes = []
   links = []
-  link_distance = 200
+  edge_length = 100
   index_id_map = {}
   id_index_map = {}
   A = [] # adjacency matrix
@@ -52,14 +52,17 @@ d3.layout.mds = ->
 
   replace_infinite_values = (A) ->
     D = clone_2d_array A
-    max_dist = 0
-    for i in [1 .. n-1]
-      for j in [0 .. i-1]
-        max_dist = Math.max max_dist, D[i][j] if isFinite(D[i][j])
-    max_dist = 3 * max_dist # max_dist + max_dist * 1/3
-    for i in [1 .. n-1]
-      for j in [0 .. i-1]
-        D[i][j] = max_dist if not isFinite(D[i][j])
+    loop_m n,(i,j) ->
+      D[i][j] = (edge_length * 10) if not isFinite(D[i][j])
+
+#    max_dist = 0
+#    for i in [1 .. n-1]
+#      for j in [0 .. i-1]
+#        max_dist = Math.max max_dist, D[i][j] if isFinite(D[i][j])
+#    max_dist = 3 * max_dist # max_dist + max_dist * 1/3
+#    for i in [1 .. n-1]
+#      for j in [0 .. i-1]
+#        D[i][j] = max_dist if not isFinite(D[i][j])
     D
 
   compute_weight_matrix = (D)->
@@ -76,8 +79,8 @@ d3.layout.mds = ->
       i = k % d
       j = Math.floor(k / d)
       node = nodes[k]
-      node.x = i unless node.x?
-      node.y = j unless node.y?
+      node.x = (i * edge_length) unless node.x?
+      node.y = (j * edge_length) unless node.y?
  
 
   initialize = ->
@@ -96,7 +99,7 @@ d3.layout.mds = ->
     for link in links
       i = Math.max id_index_map[link.source.id], id_index_map[link.target.id]
       j = Math.min id_index_map[link.source.id], id_index_map[link.target.id]
-      A[i][j] = if typeof link_distance is 'number' then link_distance else link_distance(link)
+      A[i][j] = if typeof edge_length is 'number' then edge_length else edge_length(link)
     
     needs_initialization = false
 
@@ -159,7 +162,7 @@ d3.layout.mds = ->
   mds = 
     nodes: (x)-> if x? then nodes = x; needs_initialization=true; mds else nodes
     links: (x)-> if x? then links = x; needs_initialization=true; mds else links 
-    link_distance: (x)-> if x? then link_distance = x; needs_initialization=true; mds else link_distance
+    edge_length: (x)-> if x? then edge_length = x; needs_initialization=true; mds else edge_length
 
     iterate: () ->
       event.iteration_start()
