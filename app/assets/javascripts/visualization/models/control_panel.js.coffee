@@ -1,5 +1,8 @@
 Visualization.Models.ControlPanel = Backbone.Model.extend
   initialize: ->
-    @set("target_edge_length",100)
-    @set("max_set_radius",25)
+    @on 'change', ->
+      console.log "changed"
+      console.log  arguments
+      console.log JSON.stringify @attributes
+   
   
