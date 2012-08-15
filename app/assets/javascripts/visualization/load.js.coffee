@@ -24,18 +24,21 @@ window.Visualization.init = ->
   state = Visualization.State
 
   # graph datastructure
-  nodes =  graph.nodes =  {}
-  arcs = graph.arcs =  []
+  graph.nodes_hash =  {} # hash with id's as given by the database
+  graph.arcs =  []
   $("#graph-data").data("nodes").forEach (n)->
     n.children = []
     n.parents = []
-    nodes[n.id] = n
+    graph.nodes_hash[n.id] = n
   $("#graph-data").data("arcs").forEach (arc)->
-    arc.source = nodes[arc.parent_id]
-    arc.target = nodes[arc.child_id]
-    arcs.push arc
-    nodes[arc.parent_id].children.push arc.child_id
-    nodes[arc.child_id].parents.push arc.parent_id
+    arc.source = graph.nodes_hash[arc.parent_id]
+    arc.target = graph.nodes_hash[arc.child_id]
+    graph.arcs.push arc
+    graph.nodes_hash[arc.parent_id].children.push arc.child_id
+    graph.nodes_hash[arc.child_id].parents.push arc.parent_id
+  graph.nodes_array = d3.values(graph.nodes_hash) # for some things a sparse arrays is more convenient
+  graph.N = graph.nodes_array.length
+  graph.M = graph.arcs.length
 
   svg = d3.select("#visualization").append("svg:svg").attr("width", 800).attr("height", 800).attr('id','drawing')
 
@@ -46,11 +49,9 @@ window.Visualization.init = ->
 
   layouter = Visualization.Objects.layouter = d3.layout.mds()
 
-  layouter.nodes(d3.values(nodes)).links(arcs)
+  layouter.nodes(graph.nodes_array).links(graph.arcs)
 
   svg_graph = svg.append("svg:g").attr("id","graph")
-
-
 
   links_vis = svg_graph.selectAll(".link")
     .data(layouter.links()).enter().append("line").attr("class", "link")
@@ -78,22 +79,25 @@ window.Visualization.init = ->
   layouter.on "initalization_done", ->
     console.log "mds-layouter initalization_done"
     console.log "current stress #{layouter.stress()}"
+    redraw()
+
 
   iteration_count = 0
-  prev_stress = Number.MAX_VALUE
-  current_stress = NaN
-  stress_improvement = 1
+  state.prev_stress = Number.MAX_VALUE
+  state.current_stress = NaN
+  state.stress_improvement = 1
+  state.stress_threshold = 1 / Math.pow(graph.N,2)
 
   layouter.on "iteration_end", () ->
     console.log "mds-layouter iteration_end #{iteration_count++}"
     if iteration_count % 20 == 0
       redraw()
-      current_stress = layouter.stress()
-      stress_improvement = (prev_stress - current_stress)/prev_stress
-      prev_stress = current_stress
-      console.log "current stress #{current_stress}"
-      console.log "stress_improvement #{stress_improvement}"
-    if stress_improvement > 0.00001
+      state.current_stress = layouter.stress()
+      state.stress_improvement = (state.prev_stress - state.current_stress)/state.prev_stress
+      state.prev_stress = state.current_stress
+      console.log "current stress #{state.current_stress}"
+      console.log "state.stress_improvement #{state.stress_improvement}"
+    if state.stress_improvement > state.stress_threshold
       setTimeout(layouter.iterate,1)
 
   layouter.iterate()
