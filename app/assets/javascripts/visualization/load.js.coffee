@@ -20,6 +20,9 @@ window.Visualization =
 
 window.Visualization.init = ->
 
+  Visualization.Objects.router = new Visualization.Routers.Router()
+  Backbone.history.start({pushState:true})
+
   graph = Visualization.Data.graph = {}
   state = Visualization.State
 
@@ -40,7 +43,7 @@ window.Visualization.init = ->
   graph.N = graph.nodes_array.length
   graph.M = graph.arcs.length
 
-  svg = d3.select("#visualization").append("svg:svg").attr("width", 800).attr("height", 800).attr('id','drawing')
+  svg = d3.select("svg#drawing").attr("width", 800).attr("height", 800)
 
   svg_height = ->
     $("#visualization svg").attr("height")
